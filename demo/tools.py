@@ -25,7 +25,7 @@ def IoU(rect_1, rect_2):
     intersection = x_overlap * y_overlap
     union = (x12-x11) * (y12-y11) + (x22-x21) * (y22-y21) - intersection
     if union == 0:
-	return 0
+	    return 0
     else:
         return float(intersection) / union
 '''
@@ -61,6 +61,7 @@ Input:
 Output:
 	rectangles: same as input
 '''
+
 def NMS(rectangles,threshold,type):
     sorted(rectangles,key=itemgetter(4),reverse=True)
     result_rectangles = rectangles
@@ -70,11 +71,11 @@ def NMS(rectangles,threshold,type):
         rects_to_compare = number_of_rects - cur_rect - 1 
         cur_rect_to_compare = cur_rect + 1 
         while rects_to_compare > 0:
-	    score = 0
-	    if type == 'iou':
-		score =  IoU(result_rectangles[cur_rect], result_rectangles[cur_rect_to_compare])
-	    else:
-		score =  IoM(result_rectangles[cur_rect], result_rectangles[cur_rect_to_compare])
+            score = 0
+            if type == 'iou':
+                score =  IoU(result_rectangles[cur_rect], result_rectangles[cur_rect_to_compare])
+            else:
+                score =  IoM(result_rectangles[cur_rect], result_rectangles[cur_rect_to_compare])
             if score >= threshold:
                 del result_rectangles[cur_rect_to_compare]      # delete the rectangle
                 number_of_rects -= 1
@@ -115,9 +116,9 @@ def detect_face_12net(cls_prob,roi,out_side,scale,width,height,threshold):
             y1 = int(round(max(0     , original_y1 + original_h * roi[1][x][y])))
             x2 = int(round(min(width , original_x2 + original_w * roi[2][x][y])))
             y2 = int(round(min(height, original_y2 + original_h * roi[3][x][y])))
-	    if x2>x1 and y2>y1:
-                rect = [x1,y1,x2,y2,prob]
-                boundingBox.append(rect)
+        if x2>x1 and y2>y1:
+            rect = [x1,y1,x2,y2,prob]
+            boundingBox.append(rect)
     return NMS(boundingBox,0.5,'iou')
 '''
 Function:
@@ -136,16 +137,16 @@ def filter_face_24net(cls_prob,roi,rectangles,width,height,threshold):
     boundingBox = []
     rect_num = len(rectangles)
     for i in range(rect_num):
-	if cls_prob[i][1]>threshold:
-	    original_w = rectangles[i][2]-rectangles[i][0]+1
-	    original_h = rectangles[i][3]-rectangles[i][1]+1
-	    x1 = int(round(max(0     , rectangles[i][0] + original_w * roi[i][0])))
+        if cls_prob[i][1]>threshold:
+            original_w = rectangles[i][2]-rectangles[i][0]+1
+            original_h = rectangles[i][3]-rectangles[i][1]+1
+            x1 = int(round(max(0     , rectangles[i][0] + original_w * roi[i][0])))
             y1 = int(round(max(0     , rectangles[i][1] + original_h * roi[i][1])))
             x2 = int(round(min(width , rectangles[i][2] + original_w * roi[i][2])))
             y2 = int(round(min(height, rectangles[i][3] + original_h * roi[i][3])))
-	    if x2>x1 and y2>y1:
-	        rect = [x1,y1,x2,y2,cls_prob[i][1]]
-	        boundingBox.append(rect)
+            if x2>x1 and y2>y1:
+                rect = [x1,y1,x2,y2,cls_prob[i][1]]
+                boundingBox.append(rect)
     return NMS(boundingBox,0.7,'iou')
 '''
 Function:
@@ -165,36 +166,36 @@ def filter_face_48net(cls_prob,roi,pts,rectangles,width,height,threshold):
     boundingBox = []
     rect_num = len(rectangles)
     for i in range(rect_num):
-	if cls_prob[i][1]>threshold:
-	    rect = [rectangles[i][0],rectangles[i][1],rectangles[i][2],rectangles[i][3],cls_prob[i][1],
-		   roi[i][0],roi[i][1],roi[i][2],roi[i][3],
-		   pts[i][0],pts[i][5],pts[i][1],pts[i][6],pts[i][2],pts[i][7],pts[i][3],pts[i][8],pts[i][4],pts[i][9]]
-	    boundingBox.append(rect)
+        if cls_prob[i][1]>threshold:
+            rect = [rectangles[i][0],rectangles[i][1],rectangles[i][2],rectangles[i][3],cls_prob[i][1],
+            roi[i][0],roi[i][1],roi[i][2],roi[i][3],
+            pts[i][0],pts[i][5],pts[i][1],pts[i][6],pts[i][2],pts[i][7],pts[i][3],pts[i][8],pts[i][4],pts[i][9]]
+            boundingBox.append(rect)
     rectangles = NMS(boundingBox,0.7,'iom')
     rect = []
     
     for rectangle in rectangles:
-	roi_w = rectangle[2]-rectangle[0]+1
-	roi_h = rectangle[3]-rectangle[1]+1
+        roi_w = rectangle[2]-rectangle[0]+1
+        roi_h = rectangle[3]-rectangle[1]+1
 
-  	x1 = round(max(0     , rectangle[0]+rectangle[5]*roi_w))
-        y1 = round(max(0     , rectangle[1]+rectangle[6]*roi_h))
-        x2 = round(min(width , rectangle[2]+rectangle[7]*roi_w))
-        y2 = round(min(height, rectangle[3]+rectangle[8]*roi_h))
-	pt0 = rectangle[ 9]*roi_w + rectangle[0] -1
-	pt1 = rectangle[10]*roi_h + rectangle[1] -1
-	pt2 = rectangle[11]*roi_w + rectangle[0] -1
-	pt3 = rectangle[12]*roi_h + rectangle[1] -1
-	pt4 = rectangle[13]*roi_w + rectangle[0] -1
-	pt5 = rectangle[14]*roi_h + rectangle[1] -1
-	pt6 = rectangle[15]*roi_w + rectangle[0] -1
-	pt7 = rectangle[16]*roi_h + rectangle[1] -1
-	pt8 = rectangle[17]*roi_w + rectangle[0] -1
-	pt9 = rectangle[18]*roi_h + rectangle[1] -1
-	score = rectangle[4]
-	rect_ = np.round([x1,y1,x2,y2,pt0,pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8,pt9]).astype(int)
-	rect_= np.append(rect_,score)
-	rect.append(rect_)
+    x1 = round(max(0     , rectangle[0]+rectangle[5]*roi_w))
+    y1 = round(max(0     , rectangle[1]+rectangle[6]*roi_h))
+    x2 = round(min(width , rectangle[2]+rectangle[7]*roi_w))
+    y2 = round(min(height, rectangle[3]+rectangle[8]*roi_h))
+    pt0 = rectangle[ 9]*roi_w + rectangle[0] -1
+    pt1 = rectangle[10]*roi_h + rectangle[1] -1
+    pt2 = rectangle[11]*roi_w + rectangle[0] -1
+    pt3 = rectangle[12]*roi_h + rectangle[1] -1
+    pt4 = rectangle[13]*roi_w + rectangle[0] -1
+    pt5 = rectangle[14]*roi_h + rectangle[1] -1
+    pt6 = rectangle[15]*roi_w + rectangle[0] -1
+    pt7 = rectangle[16]*roi_h + rectangle[1] -1
+    pt8 = rectangle[17]*roi_w + rectangle[0] -1
+    pt9 = rectangle[18]*roi_h + rectangle[1] -1
+    score = rectangle[4]
+    rect_ = np.round([x1,y1,x2,y2,pt0,pt1,pt2,pt3,pt4,pt5,pt6,pt7,pt8,pt9]).astype(int)
+    rect_= np.append(rect_,score)
+    rect.append(rect_)
     return rect
 '''
 Function:

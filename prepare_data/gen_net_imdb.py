@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.random as npr
-size = 48
+size = 12
 net = str(size)
 with open('%s/pos_%s.txt'%(net, size), 'r') as f:
     pos = f.readlines()
@@ -24,10 +24,10 @@ import os
 import numpy as np
 
 cls_list = []
-print '\n'+'positive-48'
+print('\n'+'positive-48')
 cur_ = 0
-sum_ = len(pos2)
-for line in pos2:
+sum_ = len(pos)
+for line in pos:
     view_bar(cur_,sum_)
     cur_ += 1
     words = line.split()
@@ -42,12 +42,12 @@ for line in pos2:
     roi      = [-1,-1,-1,-1]
     pts	     = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
     cls_list.append([im,label,roi])
-print '\n'+'negative-48'
+print('\n'+'negative-48')
 cur_ = 0
-neg_keep = npr.choice(len(neg2), size=600000, replace=False)
+neg_keep = npr.choice(len(neg), size=600000, replace=False)
 sum_ = len(neg_keep)
 for i in neg_keep:
-    line = neg2[i]
+    line = neg[i]
     view_bar(cur_,sum_)
     cur_ += 1
     words = line.split()
@@ -68,12 +68,12 @@ pickle.dump(cls_list, fid)
 fid.close()
 
 roi_list = []
-print '\n'+'part-48'
+print('\n'+'part-48')
 cur_ = 0
-part_keep = npr.choice(len(part2), size=300000, replace=False)
+part_keep = npr.choice(len(part), size=300000, replace=False)
 sum_ = len(part_keep)
 for i in part_keep:
-    line = part2[i]
+    line = part[i]
     view_bar(cur_,sum_)
     cur_ += 1
     words = line.split()
@@ -88,7 +88,7 @@ for i in part_keep:
     roi      = [float(words[2]),float(words[3]),float(words[4]),float(words[5])]
     pts	     = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
     roi_list.append([im,label,roi])
-print '\n'+'positive-48'
+print('\n'+'positive-48')
 cur_ = 0
 sum_ = len(pos2)
 for line in pos2:

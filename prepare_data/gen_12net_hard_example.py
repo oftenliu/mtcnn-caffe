@@ -30,10 +30,10 @@ def detectFace(img_path,threshold):
         scale_img = np.swapaxes(scale_img, 0, 2)
         net_12.blobs['data'].reshape(1,3,ws,hs)
         net_12.blobs['data'].data[...]=scale_img
-	caffe.set_device(0)
-	caffe.set_mode_gpu()
-	out_ = net_12.forward()
-        out.append(out_)
+    caffe.set_device(0)
+    caffe.set_mode_gpu()
+    out_ = net_12.forward()
+    out.append(out_)
     image_num = len(scales)
     rectangles = []
     for i in range(image_num):    
@@ -57,7 +57,7 @@ threshold = [0.6,0.6,0.7]
 with open(anno_file, 'r') as f:
     annotations = f.readlines()
 num = len(annotations)
-print "%d pics in total" % num
+print("%d pics in total" % num)
 
 p_idx = 0 # positive
 n_idx = 0 # negative
