@@ -110,3 +110,53 @@ import cPickle as pickle
 fid = open("../48net/48/roi.imdb",'w')
 pickle.dump(roi_list, fid)
 fid.close()
+
+
+
+
+def start(net,shuffling=False):
+
+    saveFolder = os.path.join(rootPath, "tmp/data/%s/"%(net))
+    #tfrecord name
+    if net == 'pnet':
+        tfFileName = os.path.join(saveFolder, "all.tfrecord")
+        gen_tfrecord(tfFileName, net, 'all', shuffling)
+    elif net in ['rnet', 'onet']:
+        #for n in ['pos', 'neg', 'part', 'landmark']:
+        for n in ['landmark']:
+            tfFileName = os.path.join(saveFolder, "%s.tfrecord"%(n))
+            gen_tfrecord(tfFileName, net, n, shuffling)
+    # Finally, write the labels file:
+    print('\nFinished converting the MTCNN dataset!')
+
+
+
+
+
+
+
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Create hard bbox sample...',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--stage', dest='stage', help='working stage, can be pnet, rnet, onet',
+                        default='unknow', type=str)
+    parser.add_argument('--gpus', dest='gpus', help='specify gpu to run. eg: --gpus=0,1',
+                        default='0', type=str)
+    args = parser.parse_args()
+    return args
+
+
+
+
+if __name__ == "__main__":
+
+    args = parse_args()
+    stage = 'rnet'
+    if stage not in ['pnet', 'rnet', 'onet']:
+        raise Exception("Please specify stage by --stage=pnet or rnet or onet")
+    # set GPU
+    if args.gpus:
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
+    start(stage, True)
